@@ -8,11 +8,8 @@ def maxdiff(a):
         maximum_values[n-i] = max_value
     max_dif = a[1]-a[0]
     for i in range(n-1):
-        k = n-1-i
-        m = maximum_values[k]
-        v = m - a[i]
-        if v> max_dif:
-            max_dif = v
+        if maximum_values[n-1-i] - a[i]> max_dif:
+            max_dif = maximum_values[n-1-i] - a[i]
     return max_dif
     
 def main():
@@ -41,5 +38,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    #a = [4, 3, 2, 1]
-    #print(maxdiff(a))
