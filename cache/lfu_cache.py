@@ -38,7 +38,7 @@ class LFUNode:
 """
 The LFU use a double linked list to store a bucket cache key with the same frequency access.
 Once a cache item is accessed, increase it's frequency by one and move it to the next node in the linked list.
-If a node is empty, it's removed from the linked list. The head of list always is the least frequency node.
+If a node is empty, it's removed from the linked list. The head of list is always the least frequency node.
 """
 
 class LFUCache:
