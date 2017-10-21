@@ -1,3 +1,7 @@
+"""
+The idea of algorithm is to find a maximum values of the rest set when iterate over each element.
+It's made by iterated array in reverse to find the maximum value for each set.
+"""
 def maxdiff(a):
     n = len(a)
     maximum_values = {}
