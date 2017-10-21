@@ -92,38 +92,24 @@ def test_lfu():
     
     cache_store.add('1', 1)
     assert cache_store.get('1') == 1
-    assert cache_store.first.key == '1'
-    assert cache_store.last.key == '1'
     
     cache_store.add('2', 2)
     assert cache_store.get('2') == 2
-    assert cache_store.first.key == '1'
-    assert cache_store.last.key == '2'
     
     cache_store.add('3', 3)
     assert cache_store.get('3') == 3
-    assert cache_store.first.key == '1'
-    assert cache_store.last.key == '3'
     
     cache_store.add('4', 4)
     assert cache_store.get('4') == 4
-    assert cache_store.first.key == '1'
-    assert cache_store.last.key == '4'
     
     cache_store.add('5', 5)
     assert cache_store.get('5') == 5
-    assert cache_store.first.key == '1'
-    assert cache_store.last.key == '5'
 
     cache_store.add('1', 5)
     assert cache_store.get('1') == 5
-    assert cache_store.first.key == '2'
-    assert cache_store.last.key == '1'
 
     cache_store.add('6', 6)
     assert cache_store.get('2') == None
-    assert cache_store.first.key == '6'
-    assert cache_store.last.key == '1'
 
     assert cache_store.get('6') == 6
     assert cache_store.get('6') == 6
@@ -132,7 +118,6 @@ def test_lfu():
     assert cache_store.get('4') == 4
     assert cache_store.get('3') == 3
     assert cache_store.get('3') == 3
-    assert cache_store.last.key == '3'
 
     cache_store.add('7', 7)
     assert cache_store.get('5') == None

@@ -1,90 +1,157 @@
-from cache_item import CacheItem
+class LFUCacheItem:
+    key = None
+    value = None
+    frequency = 0
+    node = None
+
+    def __init__(self):
+        self.key = None
+        self.value = None
+        self.frequency = 0
+        self.node = None
+
+class LFUNode:
+    next_node = None
+    prev_node = None
+    frequency = 0
+    items = {}
+
+    def __init__(self):
+        self.next_node = None
+        self.prev_node = None
+        self.frequency = 0
+        self.items = {}
+
+    def add_item(self, item: LFUCacheItem):
+        self.items[item.key] = item
+    
+    def remove_item(self, key):
+        if key in self.items.keys():
+            del self.items[key]
+    
+    def get_item(self):
+        return next(iter(self.items.values()))
+    
+    def is_empty(self):
+        return len(self.items) == 0
 
 """
-The algorithm is:
-- Build a double linked list
-- The first item is the least frequency item
-- The last item is the greates frequecy item
-- Once accessed a item, if it is not the last, increase frequency, then 
-move item to the end of list if it's frequency is greater or equal frequency of the last
-
-The idea behinds this algorithm is: if the last item is the greatest frequency item, don't need increase it
-'s frequency any more. By doing that, all items between the first and the last have the same frequency, and we're 
-easy to find the least frequency item -the first.
-
+The LFU use a double linked list to store a bucket cache key with the same frequency access.
+Once a cache item is accessed, increase it's frequency by one and move it to the next node in the linked list.
+If a node is empty, it's removed from the linked list. The head of list always is the least frequency node.
 """
+
 class LFUCache:
     maps = {}
     size = 0
-    first = None
-    last = None
+    head = None
 
     def __init__(self, size):
+        self.maps = {}
+        self.head = None
         self.size = size
     
     def add(self, key, value):
-        if self.first == None:
-            item = CacheItem(key, value)
-            item.frequency +=1
-            self.first = item
-            self.last = self.first
-            self.maps[key] = item
-            return
-        
         if key in self.maps.keys():
             item = self.maps[key]
             item.value = value
-            if item.key != self.last.key:
-                item.frequency +=1
-                if item.frequency >= self.last.frequency:
-                    self.__move_to_end(item)
-        else:
-            if (len(self.maps)==self.size):
-                self.remove(self.first.key)
-            item = CacheItem(key, value)
             item.frequency +=1
-            item.next_item = self.first
-            self.first.previous_item = item
-            self.first = item
-            self.maps[key] = item
+            self.__move_to_next_node(item)
+            return
+
+        if len(self.maps) == self.size:
+            item = self.head.get_item()
+            self.remove(item.key)
+        
+        item = LFUCacheItem()
+        item.key = key
+        item.value = value
+        item.frequency = 1
+
+        self.maps[key] = item
+        if self.head == None:
+            node = LFUNode()
+            node.frequency = item.frequency
+            node.add_item(item)
+            item.node = node    
+            self.head = node
+            return
+
+        if self.head.frequency == 1:
+            self.head.add_item(item)
+            item.node = self.head
+        else:
+            node = LFUNode()
+            node.frequency = item.frequency
+            node.add_item(item)
+            item.node = node
+            node.next_node = self.head
+            self.head.prev_node = node
+            self.head = node
     
     def get(self, key):
         if not key in self.maps.keys():
             return None
         item = self.maps[key]
-        if item.key != self.last.key:
-            item.frequency +=1
-            if item.frequency >= self.last.frequency:
-                self.__move_to_end(item)
-        return item.value
+        item.frequency +=1
+        self.__move_to_next_node(item)
+        
+        return self.maps[key].value
 
     def remove(self, key):
         if not key in self.maps.keys():
             return
         item = self.maps[key]
-        self.__move_to_end(item)
-        if item.previous_item !=None:
-            self.last = item.previous_item
-            item.previous_item.next_item = None
-            item.previous_item = None
-        else:
-            self.first = None
-            self.last = None
+        item.node.remove_item(item.key)
+        if(item.node.is_empty()):
+            self.__remove_empty_node(item.node)
+        item.node = None
         del self.maps[key]
-            
     
-    def __move_to_end(self, item):
-        if item.next_item == None:
-            return
-        item.next_item.previous_item = item.previous_item
-        if item.previous_item != None:
-            item.previous_item.next_item = item.next_item            
+    def __move_to_next_node(self, item: LFUCacheItem):
+        current_node = item.node
+        next_node = current_node.next_node
+        if next_node != None:
+            if next_node.frequency == item.frequency:
+                next_node.add_item(item)
+                item.node = next_node
+            else:
+                inserted_node = LFUNode()
+                inserted_node.frequency = item.frequency
+                inserted_node.add_item(item)
+                item.node = inserted_node
+
+                current_node.next_node = inserted_node
+                inserted_node.prev_node = current_node
+                
+                next_node.prev_node = inserted_node
+                inserted_node.next_node = next_node
         else:
-            self.first = item.next_item
-        self.last.next_item = item
-        item.previous_item = self.last
-        item.next_item = None
-        self.last = item
+            inserted_node = LFUNode()
+            inserted_node.frequency = item.frequency
+            inserted_node.add_item(item)
+            item.node = inserted_node
+
+            current_node.next_node = inserted_node
+            inserted_node.prev_node = current_node 
+
+        current_node.remove_item(item.key)
+
+        if current_node.is_empty():
+            self.__remove_empty_node(current_node)
     
+    def __remove_empty_node(self, empty_node: LFUNode):
+        if empty_node.prev_node == None:
+            self.head = empty_node.next_node
+            if self.head != None:
+                self.head.prev_node = None
+            empty_node.next_node = None
+        else:
+            empty_node.prev_node.next_node = empty_node.next_node
+            if empty_node.next_node != None:
+                empty_node.next_node.prev_node = empty_node.prev_node
+            empty_node.prev_node = None
+            empty_node.next_node = None
+
     def get_cache_space(self):
         return len(self.maps)
