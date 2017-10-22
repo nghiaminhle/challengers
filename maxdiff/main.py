@@ -2,20 +2,16 @@
 The idea of algorithm is to find a maximum values of the rest set when iterate over each element.
 It's made by iterated array in reverse to find the maximum value for each set.
 """
+
 def maxdiff(a):
     n = len(a)
-    maximum_values = {}
-    max_value = a[n-1]
-    for i in range(n-1, 0, -1):
-        if max_value< a[i]:
-            max_value = a[i]
-        maximum_values[n-i] = max_value
-    max_dif = a[1]-a[0]
-    for i in range(n-1):
-        if maximum_values[n-1-i] - a[i]> max_dif:
-            max_dif = maximum_values[n-1-i] - a[i]
+    max_value = a[n - 1]
+    max_dif = a[1] - a[0]
+    for i in range(n - 1, 0, -1):
+        max_value = a[i] if max_value < a[i] else max_value
+        max_dif = (max_value-a[i - 1]) if (max_value - a[i - 1] > max_dif) else max_dif
     return max_dif
-    
+
 def main():
     print('find maximum difference')
     inputs = [
@@ -39,6 +35,7 @@ def main():
     for i in range(len(inputs)):
         print('Executing test case: %s' % inputs[i])
         assert maxdiff(inputs[i]) == outputs[i]
+
 
 if __name__ == "__main__":
     main()
