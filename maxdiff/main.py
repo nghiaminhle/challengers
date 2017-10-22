@@ -4,10 +4,9 @@ It's made by iterated array in reverse to find the maximum value for each set.
 """
 
 def maxdiff(a):
-    n = len(a)
-    max_value = a[n - 1]
+    max_value = a[len(a) - 1]
     max_dif = a[1] - a[0]
-    for i in range(n - 1, 0, -1):
+    for i in range(len(a) - 1, 0, -1):
         max_value = a[i] if max_value < a[i] else max_value
         max_dif = (max_value-a[i - 1]) if (max_value - a[i - 1] > max_dif) else max_dif
     return max_dif
