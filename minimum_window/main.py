@@ -1,6 +1,6 @@
 
 """
-The algorithm is to iterate over string S by one. At every step, 
+The algorithm is to iterate over string S by one. At every step,
 find the most optimized windows size that contain all characters of T. When a windows is found:
 - if it's size is equal length of T, stop because it is the best solution
 - else compare with already solution for choose the better.
@@ -32,10 +32,12 @@ def find_minimum_windows(s, t):
                 j = found_chars[s[i]].pop(0)
                 if len(found_chars[s[i]]) == 0:
                     del found_chars[s[i]]
-                found_chars[s[i]] = [s[i]]
+                found_chars[s[i]] = [i]
                 del windows[j]
-                found_chars[s[i]].append(i)
+                #found_chars[s[i]].append(i)
             windows[i] = s[i]
+            #print(windows, found_chars)
+            #input('press')
             if count == 0:
                 has_solution = True
                 left = next(iter(windows.keys()))
@@ -66,6 +68,7 @@ def run_test():
         ["ABC", "A", "A"],
         ["ABC", "AAC", None],
         ["AXXBXBXAXXAC", "AB", "BXA"],
+        ["AACCBBA", "BCA", "ACCB"]
     ]
 
     for case in testcases:
@@ -74,8 +77,8 @@ def run_test():
 
 if __name__ == "__main__":
     run_test()
-    #s = 'ADOBECODEBANC'
-    #t = 'ABC'
+    #s = 'AACCBBA'
+    #t = 'BCA'
     #print(s, len(s))
     #print(t, len(t))
     #print(find_minimum_windows(s, t))
