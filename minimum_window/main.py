@@ -1,11 +1,14 @@
 
 """
+
 The algorithm is to iterate over string S by one. At every step,
 find the most optimized windows size that contain all characters of T. When a windows is found:
 - if it's size is equal length of T, stop because it is the best solution
 - else compare with already solution for choose the better.
 - then remove the left element of the windows to continue find a other better windows size
+
 """
+import collections
 
 def find_minimum_windows(s, t):
     if len(t) > len(s):
@@ -20,7 +23,7 @@ def find_minimum_windows(s, t):
     count = len(t)
     has_solution = False
     found_chars = {}
-    windows = {}
+    windows = collections.OrderedDict()
     for i in range(len(s)):
         if s[i] in t_chars.keys():
             if not s[i] in found_chars.keys():
@@ -32,7 +35,7 @@ def find_minimum_windows(s, t):
                 j = found_chars[s[i]].pop(0)
                 if len(found_chars[s[i]]) == 0:
                     del found_chars[s[i]]
-                found_chars[s[i]] = [i]
+                found_chars[s[i]] = [i]                
                 del windows[j]
             windows[i] = s[i]
             if count == 0:
@@ -53,6 +56,7 @@ def find_minimum_windows(s, t):
                     found_chars[left_char].pop(0)
                 del windows[left]
                 count += 1
+
     if has_solution:
         return s[best_from:best_to + 1]
     return None
