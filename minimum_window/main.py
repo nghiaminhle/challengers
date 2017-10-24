@@ -34,10 +34,7 @@ def find_minimum_windows(s, t):
                     del found_chars[s[i]]
                 found_chars[s[i]] = [i]
                 del windows[j]
-                #found_chars[s[i]].append(i)
             windows[i] = s[i]
-            #print(windows, found_chars)
-            #input('press')
             if count == 0:
                 has_solution = True
                 left = next(iter(windows.keys()))
