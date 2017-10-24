@@ -71,7 +71,7 @@ def run_test():
         ["ABC", "AAC", None],
         ["AXXBXBXAXXAC", "AB", "BXA"],
         ["AACCBBA", "BCA", "ACCB"],
-        ["babcaacabcabbbca", "aaabb", "acabcabb"]
+        ["babcaacabcabbbca", "aaabb", "babcaa"]
     ]
 
     for case in testcases:
