@@ -35,7 +35,8 @@ def find_minimum_windows(s, t):
                 j = found_chars[s[i]].pop(0)
                 if len(found_chars[s[i]]) == 0:
                     del found_chars[s[i]]
-                found_chars[s[i]] = [i]                
+                    found_chars[s[i]] = []
+                found_chars[s[i]].append(i)     
                 del windows[j]
             windows[i] = s[i]
             if count == 0:
@@ -69,7 +70,8 @@ def run_test():
         ["ABC", "A", "A"],
         ["ABC", "AAC", None],
         ["AXXBXBXAXXAC", "AB", "BXA"],
-        ["AACCBBA", "BCA", "ACCB"]
+        ["AACCBBA", "BCA", "ACCB"],
+        ["babcaacabcabbbca", "aaabb", "acabcabb"]
     ]
 
     for case in testcases:
@@ -78,8 +80,8 @@ def run_test():
 
 if __name__ == "__main__":
     run_test()
-    #s = 'AACCBBA'
-    #t = 'BCA'
+    #s = 'babcaacabcabbbca'
+    #t = 'aaabb'
     #print(s, len(s))
     #print(t, len(t))
-    #print(find_minimum_windows(s, t))
+    #print(find_minimum_windows(s, t)) # result: babcaa (shorter than 'acabcabb')
