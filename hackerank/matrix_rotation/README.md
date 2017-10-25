@@ -6,11 +6,9 @@ https://www.hackerrank.com/challenges/matrix-rotation-algo/problem
 
 Constraints 
 2 <= M, N <= 300 
-1 <= R <= 109 
-min(M, N) % 2 == 0 
-1 <= aij <= 108, where i ∈ [1..M] & j ∈ [1..N]
 
- 1  2  3  4      2  3  4  8
- 5  6  7  8      1  7 11 12
- 9 10 11 12  ->  5  6 10 16
-13 14 15 16      9 13 14 15
+1 <= R <= 109 
+
+min(M, N) % 2 == 0 
+
+1 <= aij <= 108, where i ∈ [1..M] & j ∈ [1..N]
