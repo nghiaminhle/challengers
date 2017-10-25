@@ -31,7 +31,7 @@ def find_minimum_windows(s, t):
             if len(found_chars[s[i]]) < t_chars[s[i]]:
                 found_chars[s[i]].append(i)
                 count -= 1
-            else:
+            else: # remove duplicate characters
                 j = found_chars[s[i]].pop(0)
                 if len(found_chars[s[i]]) == 0:
                     del found_chars[s[i]]
@@ -39,7 +39,7 @@ def find_minimum_windows(s, t):
                 found_chars[s[i]].append(i)     
                 del windows[j]
             windows[i] = s[i]
-            if count == 0:
+            if count == 0: # found solution
                 has_solution = True
                 left = next(iter(windows.keys()))
                 size = i - left + 1
@@ -51,6 +51,7 @@ def find_minimum_windows(s, t):
                     best_from = left
                     best_to = i
                 left_char = windows[left]
+                # remove the left to find th more minimum windows
                 if len(found_chars[left_char]) == 1:
                     del found_chars[left_char]
                 else:
@@ -84,4 +85,4 @@ if __name__ == "__main__":
     #t = 'aaabb'
     #print(s, len(s))
     #print(t, len(t))
-    #print(find_minimum_windows(s, t)) # result: babcaa (shorter than 'acabcabb')
+    #print(find_minimum_windows(s, t)) # result: babcaa
