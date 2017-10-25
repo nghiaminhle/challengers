@@ -8,6 +8,7 @@ find the most optimized windows size that contain all characters of T. When a wi
 - then remove the left element of the windows to continue find a other better windows size
 
 """
+
 import collections
 from collections import deque
 
@@ -16,7 +17,7 @@ def find_minimum_windows(s, t):
         return None
     t_chars = {}
     for i in range(len(t)):
-        if not t[i] in t_chars.keys():
+        if not t[i] in t_chars:
             t_chars[t[i]] = 0
         t_chars[t[i]] += 1
     best_from = 0
@@ -49,7 +50,7 @@ def find_minimum_windows(s, t):
 
             if count == 0: # found solution
                 has_solution = True
-                left = next(iter(window.keys()))
+                left = next(iter(window))
                 size = i - left + 1
                 if size == len(t):
                     best_from = left
