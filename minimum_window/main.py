@@ -9,6 +9,7 @@ find the most optimized windows size that contain all characters of T. When a wi
 
 """
 import collections
+from collections import deque
 
 def find_minimum_windows(s, t):
     if len(t) > len(s):
@@ -23,25 +24,32 @@ def find_minimum_windows(s, t):
     count = len(t)
     has_solution = False
     found_chars = {}
-    windows = collections.OrderedDict()
+    window = collections.OrderedDict()
+
+
     for i in range(len(s)):
-        if s[i] in t_chars.keys():
-            if not s[i] in found_chars.keys():
-                found_chars[s[i]] = [] # put position of found characters in a list.
+        if s[i] in t_chars:
+            if not s[i] in found_chars:
+                found_chars[s[i]] = deque([])
+             # put position of found characters in a list.
             if len(found_chars[s[i]]) < t_chars[s[i]]:
                 found_chars[s[i]].append(i)
                 count -= 1
-            else: # remove duplicate characters
-                j = found_chars[s[i]].pop(0)  # remove the most left element (the first of the list)
+            else: 
+                #remove the most left characters if it's found again
+                j = found_chars[s[i]].popleft()  
                 if len(found_chars[s[i]]) == 0:
                     del found_chars[s[i]]
-                    found_chars[s[i]] = []
+                    found_chars[s[i]] = deque([])
                 found_chars[s[i]].append(i)     
-                del windows[j]
-            windows[i] = s[i]
+                del window[j]
+            
+            # mark the character that is existed in the window
+            window[i] = True
+
             if count == 0: # found solution
                 has_solution = True
-                left = next(iter(windows.keys()))
+                left = next(iter(window.keys()))
                 size = i - left + 1
                 if size == len(t):
                     best_from = left
@@ -50,13 +58,13 @@ def find_minimum_windows(s, t):
                 if size < (best_to - best_from  + 1):
                     best_from = left
                     best_to = i
-                left_char = windows[left]
-                # remove the left to find th more minimum windows
+                # remove the left character of window
+                left_char = s[left]
                 if len(found_chars[left_char]) == 1:
                     del found_chars[left_char]
                 else:
-                    found_chars[left_char].pop(0)
-                del windows[left]
+                    found_chars[left_char].popleft()
+                del window[left]
                 count += 1
 
     if has_solution:
@@ -78,6 +86,7 @@ def run_test():
     for case in testcases:
         print('Executing test case %s - %s' % (case[0], case[1]))
         assert find_minimum_windows(case[0], case[1]) == case[2]
+        #break
 
 if __name__ == "__main__":
     run_test()
