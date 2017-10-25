@@ -25,7 +25,7 @@ def find_minimum_windows(s, t):
     count = len(t)
     has_solution = False
     found_chars = {}
-    window = collections.OrderedDict()
+    window = {} #collections.OrderedDict()
 
 
     for i in range(len(s)):
@@ -91,8 +91,3 @@ def run_test():
 
 if __name__ == "__main__":
     run_test()
-    #s = 'babcaacabcabbbca'
-    #t = 'aaabb'
-    #print(s, len(s))
-    #print(t, len(t))
-    #print(find_minimum_windows(s, t)) # result: babcaa
