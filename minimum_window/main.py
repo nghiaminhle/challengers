@@ -27,7 +27,7 @@ def find_minimum_windows(s, t):
     for i in range(len(s)):
         if s[i] in t_chars.keys():
             if not s[i] in found_chars.keys():
-                found_chars[s[i]] = []
+                found_chars[s[i]] = [] # put position of found characters in a list.
             if len(found_chars[s[i]]) < t_chars[s[i]]:
                 found_chars[s[i]].append(i)
                 count -= 1
