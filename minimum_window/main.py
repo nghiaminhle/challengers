@@ -32,7 +32,7 @@ def find_minimum_windows(s, t):
                 found_chars[s[i]].append(i)
                 count -= 1
             else: # remove duplicate characters
-                j = found_chars[s[i]].pop(0)
+                j = found_chars[s[i]].pop(0)  # remove the most left element (the first of the list)
                 if len(found_chars[s[i]]) == 0:
                     del found_chars[s[i]]
                     found_chars[s[i]] = []
