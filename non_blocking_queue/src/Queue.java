@@ -25,8 +25,9 @@ public class Queue {
 		while (true) {
 			if (c == 0)
 				return false;
-			if (this.head.compareAndSet(h, (h + 1) % this.size) && (this.counter.compareAndSet(c, c - 1))) {
+			if (this.head.compareAndSet(h, (h + 1) % this.size))  {
 				this.items[h] = item;
+				while(!(this.counter.compareAndSet(c, c - 1))){}
 				return true;
 			}
 			c = this.counter.get();
@@ -40,8 +41,9 @@ public class Queue {
 		while (true) {
 			if (c == size)
 				return null;
-			if (this.tail.compareAndSet(t, (t + 1) % this.size) && (this.counter.compareAndSet(c, c + 1))) {
+			if (this.tail.compareAndSet(t, (t + 1) % this.size)) {
 				Object item = this.items[t];
+				while(!(this.counter.compareAndSet(c, c + 1))){}
 				return item;
 			}
 			c = this.counter.get();
