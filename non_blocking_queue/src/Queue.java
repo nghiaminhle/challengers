@@ -19,7 +19,7 @@ public class Queue {
 		this.items = new Object[size];
 	}
 
-	public boolean enqueue(Object item) throws QueueFullException {
+	public boolean enqueue(Object item) {
 		int h = this.head.get();
 		int c = this.counter.get();
 		while (true) {
@@ -34,7 +34,7 @@ public class Queue {
 		}
 	}
 
-	public Object dequeue() throws QueueFullException {
+	public Object dequeue() {
 		int t = this.tail.get();
 		int c = this.counter.get();
 		while (true) {
