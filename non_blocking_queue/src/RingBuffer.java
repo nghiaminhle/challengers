@@ -44,6 +44,8 @@ public class RingBuffer {
 			if (this.count == 0)
 				return null;
 			if (f == 0 && this.flag.compareAndSet(f, f + 1)) {
+				if (this.count == 0)
+					return null;
 				Object item = this.items[this.tail];
 				this.tail = (this.tail + 1) % this.size;
 				this.count--;
