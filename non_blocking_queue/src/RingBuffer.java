@@ -3,9 +3,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RingBuffer {
 	private int size;
-	private int head = 0;
-	private int tail = 0;
-	private int count = 0;
+	private volatile int head = 0;
+	private volatile int tail = 0;
+	private volatile int count = 0;
 	private Object[] items;
 	private AtomicInteger flag = new AtomicInteger(0);
 
