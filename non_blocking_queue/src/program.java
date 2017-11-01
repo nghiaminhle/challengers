@@ -1,7 +1,7 @@
 
 public class program {
 	public static void main(String[] args) {
-		RingBuffer q = new RingBuffer(1048576);
+		RingBuffer q = new RingBuffer(1024);
 		
 		int noThreads = 1;
 		int noItems = 10000000;
@@ -79,14 +79,3 @@ class ConsumerThread extends Thread {
 		return counter;
 	}
 }
-
-/*for (int j = 0; j < 1000000; j++) {
-if (!q.enqueue(j)) {
-	System.out.println("queue is full");
-}
-}
-
-Object item = null;
-while ((item = q.dequeue()) != null) {
-//System.out.println(item);
-}*/

@@ -6,7 +6,7 @@ public class RingBuffer {
 	private volatile int head = 0;
 	private volatile int tail = 0;
 	private volatile int count = 0;
-	private volatile Object[] items;
+	private volatile int[] items;
 	private AtomicInteger flag = new AtomicInteger(0);
 
 	public RingBuffer() {
@@ -15,10 +15,10 @@ public class RingBuffer {
 
 	public RingBuffer(int size) {
 		this.size = size;
-		this.items = new Object[this.size];
+		this.items = new int[this.size];
 	}
 
-	public Boolean enqueue(Object item) {
+	public Boolean enqueue(int item) {
 		while (this.count < this.size) {
 			if (this.flag.compareAndSet(0, 1)) {
 				if (this.count == this.size){
@@ -35,24 +35,25 @@ public class RingBuffer {
 		return false;
 	}
 
-	public Object dequeue() {
+	public int dequeue() {
 		while (this.count > 0) {
 			if (this.flag.compareAndSet(0, 1)) {
 				if (this.count == 0){
 					this.flag.set(0);
-					return null;
+					return -1;
 				}
-				Object item = this.items[this.tail];
+				int item = this.items[this.tail];
 				this.tail = (this.tail + 1) % this.size;
 				this.count--;
 				this.flag.set(0);
 				return item;
+				//return null;
 			}
 		}
-		return null;
+		return -1;
 	}
 	
 	public Boolean isEmpty(){
-		return this.size==0;
+		return this.count==0;
 	}
 }
