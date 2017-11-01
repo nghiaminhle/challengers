@@ -21,17 +21,17 @@ public class RingBuffer {
 	public Boolean enqueue(Object item) {
 		int f = this.flag.get();
 		while (this.count < this.size) {
-			if (f == 0 && this.flag.compareAndSet(f, f + 1)) {
-				if (this.count == this.size)
+			if (this.flag.get() == 0 && this.flag.compareAndSet(0, 1)) {
+				if (this.count == this.size){
+					this.flag.compareAndSet(1, 0);
 					return false;
+				}
 				this.items[this.head] = item;
 				this.head = (this.head + 1) % this.size;
 				this.count++;
-				f = this.flag.get();
-				this.flag.compareAndSet(f, f - 1);
+				this.flag.compareAndSet(1, 0);
 				return true;
 			}
-			f = this.flag.get();
 		}
 		return false;
 	}
@@ -39,17 +39,17 @@ public class RingBuffer {
 	public Object dequeue() {
 		int f = this.flag.get();
 		while (this.count > 0) {
-			if (f == 0 && this.flag.compareAndSet(f, f + 1)) {
-				if (this.count == 0)
+			if (this.flag.get() == 0 && this.flag.compareAndSet(0, 1)) {
+				if (this.count == 0){
+					this.flag.compareAndSet(1, 0);
 					return null;
+				}
 				Object item = this.items[this.tail];
 				this.tail = (this.tail + 1) % this.size;
 				this.count--;
-				f = this.flag.get();
-				this.flag.compareAndSet(f, f - 1);
+				this.flag.compareAndSet(1, 0);
 				return item;
 			}
-			f = this.flag.get();
 		}
 		return null;
 	}
