@@ -51,4 +51,8 @@ public class RingBuffer {
 		}
 		return null;
 	}
+	
+	public Boolean isEmpty(){
+		return this.size==0;
+	}
 }
