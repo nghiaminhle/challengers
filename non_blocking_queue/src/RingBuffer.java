@@ -19,7 +19,6 @@ public class RingBuffer {
 	}
 
 	public Boolean enqueue(Object item) {
-		int f = this.flag.get();
 		while (this.count < this.size) {
 			if (this.flag.get() == 0 && this.flag.compareAndSet(0, 1)) {
 				if (this.count == this.size){
@@ -37,7 +36,6 @@ public class RingBuffer {
 	}
 
 	public Object dequeue() {
-		int f = this.flag.get();
 		while (this.count > 0) {
 			if (this.flag.get() == 0 && this.flag.compareAndSet(0, 1)) {
 				if (this.count == 0){
