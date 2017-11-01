@@ -6,7 +6,7 @@ public class RingBuffer {
 	private volatile int head = 0;
 	private volatile int tail = 0;
 	private volatile int count = 0;
-	private Object[] items;
+	private volatile Object[] items;
 	private AtomicInteger flag = new AtomicInteger(0);
 
 	public RingBuffer() {
