@@ -53,7 +53,19 @@ public class RingBuffer {
 		return -1;
 	}
 	
-	public Boolean isEmpty(){
+	public boolean isEmpty(){
 		return this.count==0;
+	}
+	
+	public int size() {
+		return this.size;
+	}
+
+	public int available() {
+		return this.count;
+	}
+
+	public boolean isFull() {
+		return this.count == this.size;
 	}
 }
