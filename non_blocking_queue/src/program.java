@@ -3,7 +3,7 @@ public class program {
 	public static void main(String[] args) throws InterruptedException {
 		RingBuffer q = new RingBuffer(1024);
 
-		int noThreads = 1;
+		int noThreads = 3;
 		int noItems = 10000000;
 		test(noThreads, noItems, q);
 
