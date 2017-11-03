@@ -1,5 +1,5 @@
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;;
 
 public class RingBuffer {
 	private int size;
@@ -7,7 +7,7 @@ public class RingBuffer {
 	private volatile int tail = 0;
 	private volatile int count = 0;
 	private volatile int[] items;
-	private AtomicInteger flag = new AtomicInteger(0);
+	private AtomicBoolean flag = new AtomicBoolean(false);
 
 	public RingBuffer() {
 		this(100);
@@ -20,16 +20,20 @@ public class RingBuffer {
 
 	public Boolean enqueue(int item) {
 		while (this.count < this.size) {
-			if (this.flag.compareAndSet(0, 1)) {
-				if (this.count == this.size){
-					this.flag.set(0);
-					return false;
+			if (this.flag.compareAndSet(false, true)) {
+				try {
+					if (this.count == this.size) {
+						return false;
+					}
+					int h = this.head;
+					this.items[h] = item;
+					this.head = (h + 1) % this.size;
+					// this.head = this.head & (this.size - 1);
+					this.count++;
+					return true;
+				} finally {
+					this.flag.set(false);
 				}
-				this.items[this.head] = item;
-				this.head = (this.head + 1) % this.size;
-				this.count++;
-				this.flag.set(0);
-				return true;
 			}
 		}
 		return false;
@@ -37,26 +41,28 @@ public class RingBuffer {
 
 	public int dequeue() {
 		while (this.count > 0) {
-			if (this.flag.compareAndSet(0, 1)) {
-				if (this.count == 0){
-					this.flag.set(0);
+			if (this.flag.compareAndSet(false, true)) {
+				if (this.count == 0) {
+					this.flag.set(false);
 					return -1;
 				}
-				int item = this.items[this.tail];
-				this.tail = (this.tail + 1) % this.size;
+				int t = this.tail;
+				int item = this.items[t];
+				this.tail = (t + 1) % this.size;
+				// this.tail = this.tail & (this.size - 1);
 				this.count--;
-				this.flag.set(0);
+				this.flag.set(false);
 				return item;
-				//return null;
+				// return -1;
 			}
 		}
 		return -1;
 	}
-	
-	public boolean isEmpty(){
-		return this.count==0;
+
+	public boolean isEmpty() {
+		return this.count == 0;
 	}
-	
+
 	public int size() {
 		return this.size;
 	}

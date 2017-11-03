@@ -1,20 +1,19 @@
 
 public class program {
 	public static void main(String[] args) throws InterruptedException {
-		RingBuffer q = new RingBuffer(1024);
+		RingBuffer q = new RingBuffer(1024*1024*16); //1024*1024
 
 		int noThreads = 3;
 		int noItems = 10000000;
 		test(noThreads, noItems, q);
-
-		System.out.println("End!");
+		
+		System.out.println("-End-");
 	}
 
 	private static void test(int noThreads, int noItems, RingBuffer queue) throws InterruptedException {
 		ConsumerThread[] consumers = new ConsumerThread[noThreads];
 		for (int i = 0; i < consumers.length; i++) {
 			consumers[i] = new ConsumerThread(queue);
-			// consumers[i].setPriority(Thread.MAX_PRIORITY);
 			consumers[i].start();
 		}
 
@@ -22,17 +21,15 @@ public class program {
 
 		long start = System.nanoTime();
 
-		int failedCount = 0;
 		for (int i = 0; i < noItems; i++) {
-			while (!queue.enqueue(i)) {
-			}
+			//while (!queue.enqueue(i)) {
+			//}
+			queue.enqueue(i);
 		}
 
 		while (!queue.isEmpty()) {
 			//Thread.onSpinWait();
 		}
-
-		System.out.println("Failed count: " + failedCount);
 
 		long elapsed = (System.nanoTime() - start) / 1000000;
 		long pace = ((long) noItems) * 1000 / elapsed ;
