@@ -1,16 +1,23 @@
 
 public class program {
-	public static void main(String[] args) throws InterruptedException {
-		RingBuffer q = new RingBuffer(1024*1024*16); //1024*1024
 
-		int noThreads = 3;
+	public static void main(String[] args) throws Exception {
+		// Queue q = new RingBuffer(1024 * 1024 * 16); // 1024*1024
+		//Queue q = new RingBufferV2(1024 * 1024); // 1024*1024
+		Queue q = new RingBufferV2(4 * 4);
+
+		int noThreads = 1;
 		int noItems = 10000000;
 		test(noThreads, noItems, q);
 		
-		System.out.println("-End-");
+		/*for(int i=0; i<20;i++){
+			q.enqueue(i);
+			System.out.println(q.dequeue());
+		}*/
+		System.out.println("-End!-");
 	}
 
-	private static void test(int noThreads, int noItems, RingBuffer queue) throws InterruptedException {
+	private static void test(int noThreads, int noItems, Queue queue) throws InterruptedException {
 		ConsumerThread[] consumers = new ConsumerThread[noThreads];
 		for (int i = 0; i < consumers.length; i++) {
 			consumers[i] = new ConsumerThread(queue);
@@ -22,17 +29,19 @@ public class program {
 		long start = System.nanoTime();
 
 		for (int i = 0; i < noItems; i++) {
-			//while (!queue.enqueue(i)) {
-			//}
-			queue.enqueue(i);
+			while (!queue.enqueue(i)) {
+				//System.out.println(i + "-is full:" + queue.isFull());
+			}
+			// queue.enqueue(i);
 		}
 
 		while (!queue.isEmpty()) {
-			//Thread.onSpinWait();
+			// Thread.onSpinWait();
+			//System.out.println("is empty:" + queue.isEmpty());
 		}
 
 		long elapsed = (System.nanoTime() - start) / 1000000;
-		long pace = ((long) noItems) * 1000 / elapsed ;
+		long pace = ((long) noItems) * 1000 / elapsed;
 
 		System.out.println("finish all " + noItems + " works at " + elapsed + "ms. Pace: " + pace + " items/s");
 
@@ -55,11 +64,11 @@ public class program {
 
 class ConsumerThread extends Thread {
 
-	private RingBuffer queue;
+	private Queue queue;
 
 	private int counter = 0;
 
-	public ConsumerThread(RingBuffer queue) {
+	public ConsumerThread(Queue queue) {
 		this.queue = queue;
 	}
 
@@ -67,7 +76,7 @@ class ConsumerThread extends Thread {
 	public void run() {
 		while (!Thread.currentThread().isInterrupted()) {
 			while (!Thread.currentThread().isInterrupted() && queue.isEmpty()) {
-				//Thread.onSpinWait();
+				// Thread.onSpinWait();
 			}
 			queue.dequeue();
 			// if (item != null) counter++;

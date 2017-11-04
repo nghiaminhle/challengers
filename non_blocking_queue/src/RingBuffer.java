@@ -1,12 +1,12 @@
 
 import java.util.concurrent.atomic.AtomicBoolean;;
 
-public class RingBuffer {
+public class RingBuffer implements Queue {
 	private int size;
 	private volatile int head = 0;
 	private volatile int tail = 0;
+	private int[] items;
 	private volatile int count = 0;
-	private volatile int[] items;
 	private AtomicBoolean flag = new AtomicBoolean(false);
 
 	public RingBuffer() {
@@ -23,6 +23,7 @@ public class RingBuffer {
 			if (this.flag.compareAndSet(false, true)) {
 				try {
 					if (this.count == this.size) {
+						this.flag.set(false);
 						return false;
 					}
 					int h = this.head;
