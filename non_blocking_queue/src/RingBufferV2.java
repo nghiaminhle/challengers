@@ -32,7 +32,7 @@ public class RingBufferV2 implements Queue {
 		if (this.head != b) {
 			this.head = (this.head + 1) & (this.size - 1);
 		}
-		this.count++;
+		this.alert = true;
 		return true;
 	}
 
