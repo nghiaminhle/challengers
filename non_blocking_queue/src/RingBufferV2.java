@@ -37,6 +37,9 @@ public class RingBufferV2 implements Queue {
 	}
 
 	public int dequeue() {
+		if(this.alert){
+			this.alert = false;
+		}
 		if (this.tail == this.head) {
 			return -1;
 		}
