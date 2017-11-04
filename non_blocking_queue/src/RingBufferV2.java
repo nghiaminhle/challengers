@@ -1,13 +1,10 @@
 
-import java.util.concurrent.atomic.AtomicBoolean;;
-
 public class RingBufferV2 implements Queue {
 	private int size;
-	private int head = 0;
-	private int tail = 0;
-	private int[] items;
+	private volatile int head = 0;
+	private volatile int tail = 0;
+	private volatile int[] items;
 	private volatile int count = 0;
-	private AtomicBoolean flag = new AtomicBoolean(false);
 	private volatile boolean alert;
 
 	public RingBufferV2() {
@@ -24,29 +21,27 @@ public class RingBufferV2 implements Queue {
 	}
 
 	public Boolean enqueue(int item) {
-		int b = this.tail == 0 ? (size - 1) : this.tail - 1;
-		if (this.head == b) {
+		int b = this.head == 0 ? (size - 1) : this.head - 1;
+		if (this.tail == b) {
 			return false;
 		}
-		this.items[this.head] = item;
-		if (this.head != b) {
-			this.head = (this.head + 1) & (this.size - 1);
+		this.items[this.tail] = item;
+		if (this.tail != b) {
+			this.tail = (this.tail + 1) & (this.size - 1);
 		}
 		this.alert = true;
 		return true;
 	}
 
 	public int dequeue() {
-		if(this.alert){
-			this.alert = false;
-		}
 		if (this.tail == this.head) {
 			return -1;
 		}
-		int item = this.items[this.tail];
-		if (this.tail != this.head) {
-			this.tail = (this.tail + 1) & (this.size - 1);
+		int item = this.items[this.head];
+		if (this.head != this.tail) {
+			this.head = (this.head + 1) & (this.size - 1);
 		}
+		this.alert = false;
 		return item;
 	}
 
@@ -64,11 +59,11 @@ public class RingBufferV2 implements Queue {
 
 	public boolean isFull() {
 		int c = 0;
-		if (this.head > this.tail) {
-			c = this.head - this.tail;
+		if (this.tail > this.head) {
+			c = this.tail - this.head;
 		}
-		if (this.head < this.tail) {
-			c = this.head + this.size - this.tail;
+		if (this.tail < this.head) {
+			c = this.tail + this.size - this.head;
 		}
 		return c == (this.size - 1);
 	}
