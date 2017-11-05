@@ -10,7 +10,10 @@ public class RingBufferV2 implements Queue {
 	protected long p9, p10, p11, p12, p13, p14, p15;
 	private volatile long tail = 0;
 
+	protected long p16, p17, p18, p19, p20, p21, p22;
 	private long headCache = 0;
+	
+	protected long p23, p24, p25, p26, p27, p28, p29;
 	private long tailCache = 0;
 
 	private int[] items;
