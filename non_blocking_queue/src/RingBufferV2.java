@@ -1,9 +1,12 @@
 import java.lang.reflect.Field;
 import sun.misc.Unsafe;
+import sun.misc.Contended;
 
 public class RingBufferV2 implements Queue {
 	private int size;
+	@Contended
 	private volatile long head = 0;
+	@Contended
 	private volatile long tail = 0;
 	private int[] items;
 	
