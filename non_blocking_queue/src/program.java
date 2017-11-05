@@ -11,6 +11,7 @@ public class program {
 		//Queue q = new RingBuffer(1024 * 1024 * 16); // 1024*1024
 		Queue q = new RingBufferV2(1024 * 1024);
 		//Queue q = new RingBufferV3(1024 * 1024);
+		//Queue q = new RingBufferV4(1024 * 1024);
 
 		int rounds = 100;
 		long pace = 0;
@@ -55,7 +56,7 @@ public class program {
 		}
 
 		while (!queue.isEmpty()) {
-			// Thread.onSpinWait();
+			Thread.onSpinWait();
 			// System.out.println("is empty:" + queue.isEmpty());
 		}
 
@@ -102,7 +103,7 @@ class ConsumerThread extends Thread {
 	public void run() {
 		while (!Thread.currentThread().isInterrupted()) {
 			while (!Thread.currentThread().isInterrupted() && queue.isEmpty()) {
-				// Thread.onSpinWait();
+				Thread.onSpinWait();
 			}
 			int item = queue.dequeue();
 			if (item != -1) {
