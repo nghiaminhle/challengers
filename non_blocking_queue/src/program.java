@@ -3,23 +3,40 @@ public class program {
 
 	public static void main(String[] args) throws Exception {
 		testQueue();
-	    
+
 		System.out.println("-End!-");
 	}
-	
+
 	private static void testQueue() throws Exception {
-		// Queue q = new RingBuffer(1024 * 1024 * 16); // 1024*1024
-		Queue q = new RingBufferV2(1024 * 1024);
-		for (int r = 0; r < 100; r++) {
+		 Queue q = new RingBuffer(1024 * 1024 * 16); // 1024*1024
+		// Queue q = new RingBufferV2(1024 * 1024);
+		//Queue q = new RingBufferV3(1024 * 1024);
+
+		int rounds = 100;
+		long pace = 0;
+		long min = 0;
+		long max = 0;
+		for (int r = 0; r < rounds; r++) {
 			System.out.println(r);
 
 			int noThreads = 1;
 			int noItems = 10000000;
-			test(noThreads, noItems, q);
+			long result = test(noThreads, noItems, q);
+			pace += result;
+			if (result > max) {
+				max = result;
+				if (min == 0) {
+					min = max;
+				}
+			}
+			if (result < min) {
+				min = result;
+			}
 		}
+		System.out.println("Average throughput: " + (pace / rounds) + " items/s. Max: "+max+" items/s. Min: "+min+" items/s");
 	}
 
-	private static void test(int noThreads, int noItems, Queue queue) throws InterruptedException {
+	private static long test(int noThreads, int noItems, Queue queue) throws InterruptedException {
 		ConsumerThread[] consumers = new ConsumerThread[noThreads];
 		for (int i = 0; i < consumers.length; i++) {
 			consumers[i] = new ConsumerThread(queue);
@@ -66,6 +83,8 @@ public class program {
 		}
 
 		System.out.println("all threads stopped at " + (System.nanoTime() - start) / 1000000 + "ms");
+
+		return pace;
 	}
 }
 

@@ -3,12 +3,12 @@ import sun.misc.Unsafe;
 
 public class RingBufferV2 implements Queue {
 	private int size;
-	private volatile int head = 0;
-	private volatile int tail = 0;
+	private volatile long head = 0;
+	private volatile long tail = 0;
 	private int[] items;
 	
-	private static final int headOffset;
-	private static final int tailOffset;
+	private static final long headOffset;
+	private static final long tailOffset;
 	public static final Unsafe UNSAFE;
 	static {
 		try {
@@ -16,8 +16,8 @@ public class RingBufferV2 implements Queue {
 			f.setAccessible(true);
 			UNSAFE = (Unsafe) f.get(null);
 
-			headOffset = (int)UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("head"));
-			tailOffset = (int)UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("tail"));
+			headOffset = UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("head"));
+			tailOffset = UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("tail"));
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -38,13 +38,13 @@ public class RingBufferV2 implements Queue {
 	}
 
 	public Boolean enqueue(int item) {
-		int b = this.head == 0 ? (size - 1) : this.head - 1;
-		int t = this.tail; 
+		long b = this.head == 0 ? (size - 1) : this.head - 1;
+		long t = this.tail; 
 		if (t == b) {
 			return false;
 		}
-		this.items[t] = item;
-		UNSAFE.putOrderedInt(this, tailOffset, (t + 1) & (this.size - 1));
+		this.items[(int)t] = item;
+		UNSAFE.putOrderedLong(this, tailOffset, (t + 1) & (this.size - 1));
 		return true;
 	}
 
@@ -52,9 +52,9 @@ public class RingBufferV2 implements Queue {
 		if (this.tail == this.head) {
 			return -1;
 		}
-		int h = this.head;
-		int item = this.items[h];
-		UNSAFE.putOrderedInt(this, headOffset, (h + 1) & (this.size - 1));
+		long h = this.head;
+		int item = this.items[(int)h];
+		UNSAFE.putOrderedLong(this, headOffset, (h + 1) & (this.size - 1));
 		return item;
 	}
 

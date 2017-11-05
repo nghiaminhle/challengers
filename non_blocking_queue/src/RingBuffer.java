@@ -1,5 +1,5 @@
 
-import java.util.concurrent.atomic.AtomicBoolean;;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RingBuffer implements Queue {
 	private int size;
