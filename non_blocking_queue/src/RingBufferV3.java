@@ -18,7 +18,7 @@ public class RingBufferV3 implements Queue {
 		this.items = new int[this.size];
 	}
 
-	public Boolean enqueue(int item) {
+	public boolean enqueue(int item) {
 		long t = this.tail.get();
 		long h = this.head.get();
 		long b = h == 0 ? (size - 1) : h - 1;

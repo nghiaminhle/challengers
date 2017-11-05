@@ -18,7 +18,7 @@ public class RingBuffer implements Queue {
 		this.items = new int[this.size];
 	}
 
-	public Boolean enqueue(int item) {
+	public boolean enqueue(int item) {
 		while (this.count < this.size) {
 			if (this.flag.compareAndSet(false, true)) {
 				try {

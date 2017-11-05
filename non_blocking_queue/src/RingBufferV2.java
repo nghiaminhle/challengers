@@ -44,7 +44,7 @@ public class RingBufferV2 implements Queue {
 		this.items = new int[this.size];
 	}
 
-	public Boolean enqueue(int item) {
+	public boolean enqueue(int item) {
 		long b = this.head == 0 ? (size - 1) : this.head - 1;
 		long t = this.tail; 
 		if (t == b) {

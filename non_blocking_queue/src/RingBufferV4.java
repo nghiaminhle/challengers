@@ -26,7 +26,7 @@ public class RingBufferV4 implements Queue {
 		this.items = new int[this.size];
 	}
 
-	public Boolean enqueue(int item) {
+	public boolean enqueue(int item) {
 		long t = this.tail.get();
 		if (t == (this.headCache.value == 0 ? (size - 1) : this.headCache.value - 1)) {
 			this.headCache.value = this.head.get();
