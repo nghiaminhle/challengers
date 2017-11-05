@@ -10,11 +10,11 @@ public class RingBufferV2 implements Queue {
 	protected long p9, p10, p11, p12, p13, p14, p15;
 	private volatile long tail = 0;
 
-	protected long p16, p17, p18, p19, p20, p21, p22;
-	private long headCache = 0;
+	//protected long p16, p17, p18, p19, p20, p21, p22;
+	//private long headCache = 0;
 	
-	protected long p23, p24, p25, p26, p27, p28, p29;
-	private long tailCache = 0;
+	//protected long p23, p24, p25, p26, p27, p28, p29;
+	//private long tailCache = 0;
 
 	private int[] items;
 
@@ -49,11 +49,12 @@ public class RingBufferV2 implements Queue {
 
 	public boolean enqueue(int item) {
 		long t = this.tail;
-		if (t == (this.headCache == 0 ? (size - 1) : this.headCache - 1)) {
-			this.headCache = this.head;
+		if (t == (this.head == 0 ? (size - 1) : this.head - 1)) {
+			return false;
+			/*this.headCache = this.head;
 			if (t == (this.headCache == 0 ? (size - 1) : this.headCache - 1)) {
 				return false;
-			}
+			}*/
 		}
 		this.items[(int) t] = item;
 		UNSAFE.putOrderedLong(this, tailOffset, (t + 1) & (this.size - 1));
@@ -62,11 +63,8 @@ public class RingBufferV2 implements Queue {
 
 	public int dequeue() {
 		long h = this.head;
-		if (h == this.tailCache) {
-			this.tailCache = this.tail;
-			if (h == this.tailCache) {
-				return -1;
-			}
+		if (h == this.tail) {
+			return -1;
 		}
 		int item = this.items[(int) h];
 		UNSAFE.putOrderedLong(this, headOffset, (h + 1) & (this.size - 1));
