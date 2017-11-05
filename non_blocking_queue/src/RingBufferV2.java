@@ -4,10 +4,12 @@ import sun.misc.Contended;
 
 public class RingBufferV2 implements Queue {
 	private int size;
-	@Contended
+	protected long p1, p2, p3, p4, p5, p6, p7;
+	//@Contended
 	private volatile long head = 0;
-	@Contended
+	//@Contended
 	private volatile long tail = 0;
+	protected long p9, p10, p11, p12, p13, p14, p15;
 	private int[] items;
 	
 	private static final long headOffset;

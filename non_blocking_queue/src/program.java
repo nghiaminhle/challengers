@@ -8,7 +8,7 @@ public class program {
 	}
 
 	private static void testQueue() throws Exception {
-		// Queue q = new RingBuffer(1024 * 1024 * 16); // 1024*1024
+		//Queue q = new RingBuffer(1024 * 1024 * 16); // 1024*1024
 		Queue q = new RingBufferV2(1024 * 1024);
 		//Queue q = new RingBufferV3(1024 * 1024);
 

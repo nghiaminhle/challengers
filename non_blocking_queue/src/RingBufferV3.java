@@ -2,8 +2,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class RingBufferV3 implements Queue {
 	private int size;
-	private AtomicLong head = new AtomicLong(0);
-	private AtomicLong tail = new AtomicLong(0);
+	private AtomicLong head = new PaddedAtomicLong(0);
+	private AtomicLong tail = new PaddedAtomicLong(0);
 	private int[] items;
 	
 	public RingBufferV3() {
@@ -54,4 +54,15 @@ public class RingBufferV3 implements Queue {
 	private boolean isPowerOf2(int maximumSize) {
 		return (maximumSize & (maximumSize - 1)) == 0;
 	}
+}
+
+class PaddedAtomicLong extends AtomicLong {
+	public PaddedAtomicLong() {
+	}
+
+	public PaddedAtomicLong(final long initialValue) {
+		super(initialValue);
+	}
+
+	public volatile long p1, p2, p3, p4, p5, p6 = 7;
 }
