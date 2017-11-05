@@ -2,9 +2,13 @@
 public class program {
 
 	public static void main(String[] args) throws Exception {
+		testQueue();
+	    
+		System.out.println("-End!-");
+	}
+	
+	private static void testQueue() throws Exception {
 		// Queue q = new RingBuffer(1024 * 1024 * 16); // 1024*1024
-		// Queue q = new RingBufferV2(1024 * 1024); // 1024*1024
-
 		Queue q = new RingBufferV2(1024 * 1024);
 		for (int r = 0; r < 100; r++) {
 			System.out.println(r);
@@ -13,12 +17,6 @@ public class program {
 			int noItems = 10000000;
 			test(noThreads, noItems, q);
 		}
-
-		/*
-		 * for(int i=0; i<20;i++){ q.enqueue(i);
-		 * System.out.println(q.dequeue()); }
-		 */
-		System.out.println("-End!-");
 	}
 
 	private static void test(int noThreads, int noItems, Queue queue) throws InterruptedException {

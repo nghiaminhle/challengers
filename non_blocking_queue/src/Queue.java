@@ -4,5 +4,4 @@ public interface Queue {
 	public int dequeue();
 	public boolean isEmpty();
 	public boolean isFull();
-	public int available();
 }

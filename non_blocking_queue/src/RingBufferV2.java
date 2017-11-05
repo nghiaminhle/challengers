@@ -1,11 +1,29 @@
+import java.lang.reflect.Field;
+import sun.misc.Unsafe;
 
 public class RingBufferV2 implements Queue {
 	private int size;
 	private volatile int head = 0;
 	private volatile int tail = 0;
-	private volatile int[] items;
-	private volatile int count = 0;
-	private volatile boolean alert;
+	private int[] items;
+	
+	private static final int headOffset;
+	private static final int tailOffset;
+	public static final Unsafe UNSAFE;
+	static {
+		try {
+			Field f = Unsafe.class.getDeclaredField("theUnsafe");
+			f.setAccessible(true);
+			UNSAFE = (Unsafe) f.get(null);
+
+			headOffset = (int)UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("head"));
+			tailOffset = (int)UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("tail"));
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 
 	public RingBufferV2() {
 		this(1024);
@@ -15,21 +33,18 @@ public class RingBufferV2 implements Queue {
 		if (!isPowerOf2(size)) {
 			throw new RuntimeException("Maximum size must be power of 2");
 		}
-		this.alert = true;
 		this.size = size;
 		this.items = new int[this.size];
 	}
 
 	public Boolean enqueue(int item) {
 		int b = this.head == 0 ? (size - 1) : this.head - 1;
-		if (this.tail == b) {
+		int t = this.tail; 
+		if (t == b) {
 			return false;
 		}
-		this.items[this.tail] = item;
-		if (this.tail != b) {
-			this.tail = (this.tail + 1) & (this.size - 1);
-		}
-		this.alert = true;
+		this.items[t] = item;
+		UNSAFE.putOrderedInt(this, tailOffset, (t + 1) & (this.size - 1));
 		return true;
 	}
 
@@ -37,11 +52,9 @@ public class RingBufferV2 implements Queue {
 		if (this.tail == this.head) {
 			return -1;
 		}
-		int item = this.items[this.head];
-		if (this.head != this.tail) {
-			this.head = (this.head + 1) & (this.size - 1);
-		}
-		this.alert = false;
+		int h = this.head;
+		int item = this.items[h];
+		UNSAFE.putOrderedInt(this, headOffset, (h + 1) & (this.size - 1));
 		return item;
 	}
 
@@ -53,19 +66,14 @@ public class RingBufferV2 implements Queue {
 		return this.size;
 	}
 
-	public int available() {
-		return this.count;
-	}
-
 	public boolean isFull() {
-		int c = 0;
 		if (this.tail > this.head) {
-			c = this.tail - this.head;
+			return (this.tail - this.head)==(this.size - 1);
 		}
 		if (this.tail < this.head) {
-			c = this.tail + this.size - this.head;
+			return (this.tail + this.size - this.head)==(this.size - 1);
 		}
-		return c == (this.size - 1);
+		return false;
 	}
 
 	private boolean isPowerOf2(int maximumSize) {
