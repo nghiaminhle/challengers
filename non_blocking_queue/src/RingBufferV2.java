@@ -3,17 +3,18 @@ import sun.misc.Unsafe;
 
 public class RingBufferV2 implements Queue {
 	private int size;
-	
+
 	protected long p1, p2, p3, p4, p5, p6, p7;
 	private volatile long head = 0;
-	
+
 	protected long p9, p10, p11, p12, p13, p14, p15;
 	private volatile long tail = 0;
-	
-	
-	
+
+	private long headCache = 0;
+	private long tailCache = 0;
+
 	private int[] items;
-	
+
 	private static final long headOffset;
 	private static final long tailOffset;
 	public static final Unsafe UNSAFE;
@@ -25,12 +26,11 @@ public class RingBufferV2 implements Queue {
 
 			headOffset = UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("head"));
 			tailOffset = UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("tail"));
-			
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
 
 	public RingBufferV2() {
 		this(1024);
@@ -45,22 +45,27 @@ public class RingBufferV2 implements Queue {
 	}
 
 	public boolean enqueue(int item) {
-		long b = this.head == 0 ? (size - 1) : this.head - 1;
-		long t = this.tail; 
-		if (t == b) {
-			return false;
+		long t = this.tail;
+		if (t == (this.headCache == 0 ? (size - 1) : this.headCache - 1)) {
+			this.headCache = this.head;
+			if (t == (this.headCache == 0 ? (size - 1) : this.headCache - 1)) {
+				return false;
+			}
 		}
-		this.items[(int)t] = item;
+		this.items[(int) t] = item;
 		UNSAFE.putOrderedLong(this, tailOffset, (t + 1) & (this.size - 1));
 		return true;
 	}
 
 	public int dequeue() {
-		if (this.tail == this.head) {
-			return -1;
-		}
 		long h = this.head;
-		int item = this.items[(int)h];
+		if (h == this.tailCache) {
+			this.tailCache = this.tail;
+			if (h == this.tailCache) {
+				return -1;
+			}
+		}
+		int item = this.items[(int) h];
 		UNSAFE.putOrderedLong(this, headOffset, (h + 1) & (this.size - 1));
 		return item;
 	}
@@ -75,10 +80,10 @@ public class RingBufferV2 implements Queue {
 
 	public boolean isFull() {
 		if (this.tail > this.head) {
-			return (this.tail - this.head)==(this.size - 1);
+			return (this.tail - this.head) == (this.size - 1);
 		}
 		if (this.tail < this.head) {
-			return (this.tail + this.size - this.head)==(this.size - 1);
+			return (this.tail + this.size - this.head) == (this.size - 1);
 		}
 		return false;
 	}
