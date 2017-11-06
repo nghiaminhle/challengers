@@ -10,12 +10,6 @@ public class RingBufferV2 implements Queue {
 	protected long p9, p10, p11, p12, p13, p14, p15;
 	private volatile long tail = 0;
 
-	//protected long p16, p17, p18, p19, p20, p21, p22;
-	//private long headCache = 0;
-	
-	//protected long p23, p24, p25, p26, p27, p28, p29;
-	//private long tailCache = 0;
-
 	private int[] items;
 
 	private static final long headOffset;
@@ -51,10 +45,6 @@ public class RingBufferV2 implements Queue {
 		long t = this.tail;
 		if (t == (this.head == 0 ? (size - 1) : this.head - 1)) {
 			return false;
-			/*this.headCache = this.head;
-			if (t == (this.headCache == 0 ? (size - 1) : this.headCache - 1)) {
-				return false;
-			}*/
 		}
 		this.items[(int) t] = item;
 		UNSAFE.putOrderedLong(this, tailOffset, (t + 1) & (this.size - 1));
