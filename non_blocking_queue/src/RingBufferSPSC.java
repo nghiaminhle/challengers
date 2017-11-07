@@ -1,12 +1,14 @@
+
 import java.lang.reflect.Field;
 import sun.misc.Unsafe;
 
 /**
  * Ring Buffer for Single Producer and Single Consumer
- * Only for test integer
- * */
+ * Design for generic type
+ * Use Unsafe put ordered long and access array
+ */
 
-public class RingBufferV2 implements Queue {
+public class RingBufferSPSC<T> {
 	private int size;
 
 	protected long p1, p2, p3, p4, p5, p6, p7;
@@ -15,11 +17,15 @@ public class RingBufferV2 implements Queue {
 	protected long p9, p10, p11, p12, p13, p14, p15;
 	private volatile long tail = 0;
 
-	private int[] items;
+	private Object[] items;
 
 	private static final long headOffset;
 	private static final long tailOffset;
 	public static final Unsafe UNSAFE;
+
+	private static final int baseOffset;
+	private static final int indexScale;
+
 	static {
 		try {
 			Field f = Unsafe.class.getDeclaredField("theUnsafe");
@@ -29,42 +35,42 @@ public class RingBufferV2 implements Queue {
 			headOffset = UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("head"));
 			tailOffset = UNSAFE.objectFieldOffset(RingBufferV2.class.getDeclaredField("tail"));
 
+			baseOffset = UNSAFE.arrayBaseOffset(Object[].class);
+			indexScale = UNSAFE.arrayIndexScale(Object[].class);
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public RingBufferV2() {
+	public RingBufferSPSC() {
 		this(1024);
 	}
 
-	public RingBufferV2(int size) {
+	@SuppressWarnings("unchecked")
+	public RingBufferSPSC(int size) {
 		if (!isPowerOf2(size)) {
 			throw new RuntimeException("Maximum size must be power of 2");
 		}
 		this.size = size;
-		this.items = new int[this.size];
+		this.items = new Object[this.size];
 	}
 
-	public boolean enqueue(int item) {
-		long t = this.tail;
-		long nextTail = (t + 1) & (this.size - 1);
-		if (nextTail == this.head) {
+	public boolean enqueue(T item) {
+		long nextTail = (tail + indexScale) & (this.size - 1);
+		if (nextTail == head)
 			return false;
-		}
-		this.items[(int) t] = item;
+		UNSAFE.putObject(items, baseOffset + tail, item);
 		UNSAFE.putOrderedLong(this, tailOffset, nextTail);
 		return true;
 	}
 
-	public int dequeue() {
-		long h = this.head;
-		if (h == this.tail) {
-			return -1;
-		}
-		int item = this.items[(int) h];
-		UNSAFE.putOrderedLong(this, headOffset, (h + 1) & (this.size - 1));
-		return item;
+	public T dequeue() {
+		if (this.isEmpty())
+			return null;
+		T result = (T) UNSAFE.getObject(items, baseOffset + head);
+		UNSAFE.putOrderedLong(this, headOffset, (head + indexScale) & (this.size - 1));
+		return result;
 	}
 
 	public boolean isEmpty() {

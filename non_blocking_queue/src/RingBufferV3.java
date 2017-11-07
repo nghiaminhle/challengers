@@ -1,5 +1,11 @@
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Ring Buffer for Single Producer and Single Consumer
+ * Only for test integer
+ * Use Atomic Lazy Set
+ */
+
 public class RingBufferV3 implements Queue {
 	private int size;
 	private AtomicLong head = new PaddedAtomicLong(0);
